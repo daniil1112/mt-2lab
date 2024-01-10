@@ -32,11 +32,11 @@ class LexicalAnalyzer(private val stream: InputStream) {
     }
 
     private fun nextChar() {
-        curPos++;
+        curPos++
         try {
-            curChar = stream.read();
+            curChar = stream.read()
         } catch (e: IOException) {
-            throw ParseException(e.message, curPos);
+            throw ParseException(e.message, curPos)
         }
     }
 
@@ -72,7 +72,7 @@ class LexicalAnalyzer(private val stream: InputStream) {
             return updateAndGetCurrentToken(Token.STAR)
         }
 
-        throw ParseException("Illegal character ${Char(curChar)}", curPos);
+        throw ParseException("Illegal character ${Char(curChar)}", curPos)
     }
 
     fun curToken(): Token {
