@@ -90,6 +90,11 @@ class ParserTest {
     }
 
     @Test
+    fun testConcatWithRepeats() {
+        successParse("ab{1}")
+    }
+
+    @Test
     fun allTest() {
         successParse("ab|c*d")
     }
@@ -117,6 +122,17 @@ class ParserTest {
     @Test
     fun invalidManyOR() {
         assertError("a||b")
+    }
+
+    @Test
+    fun invalidOrWithRepeats() {
+        assertError("a|{1}")
+    }
+
+    @Test
+    fun invalidCliniWithRepeats() {
+        assertError("a*{1}")
+        assertError("a{1}*")
     }
 
     private fun successParse(expression: String) {

@@ -16,13 +16,28 @@ class LexicalAnalyzerTest {
     }
 
     @Test
+    fun testNumber() {
+        check("123", Token.NUMBER)
+    }
+
+    @Test
+    fun testTwoNumbers() {
+        check("123   456", Token.NUMBER, Token.NUMBER)
+    }
+
+    @Test
+    fun testFBrackets() {
+        check("{}}", Token.LPARENF, Token.RPARENF, Token.RPARENF)
+    }
+
+    @Test
     fun testVarParsing() {
         val lex = LexicalAnalyzer(getIS("abc"))
         assertEquals(Token.START, lex.curToken())
         for (ch in "abc") {
             lex.nextToken()
             assertEquals(Token.VAR, lex.curToken())
-            assertEquals(lex.curChar(), ch.code)
+            assertEquals(lex.curValue(), ch.toString())
         }
         lex.nextToken()
         assertEquals(Token.END, lex.curToken())

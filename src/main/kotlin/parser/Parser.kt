@@ -39,7 +39,7 @@ class Parser(private val lex: LexicalAnalyzer) {
     }
 
     private fun parseConcat(): Tree {
-        val clini = parseClini()
+        val clini = parseCliniOrRepeats()
         val concatContinue = parseConcatContinue()
         return nonTerminal("concat", clini, concatContinue)
     }
@@ -47,7 +47,7 @@ class Parser(private val lex: LexicalAnalyzer) {
     private fun parseConcatContinue(): Tree {
         return when (lex.curToken()) {
             Token.VAR, Token.LPAREN, Token.STAR -> {
-                val clini = parseClini()
+                val clini = parseCliniOrRepeats()
                 val concatContinue = parseConcatContinue()
                 nonTerminal("concatContinue", clini, concatContinue)
             }
@@ -58,20 +58,31 @@ class Parser(private val lex: LexicalAnalyzer) {
         }
     }
 
-    private fun parseClini(): Tree {
+    private fun parseCliniOrRepeats(): Tree {
         val base = parseBase()
-        val cliniContinue = parseCliniContinue()
-        return nonTerminal("clini", base, cliniContinue)
+        val cliniContinue = parseCliniOrRepeatsContinue()
+        return nonTerminal("cliniOrRepeats", base, cliniContinue)
     }
 
-    private fun parseCliniContinue(): Tree {
+    private fun parseCliniOrRepeatsContinue(): Tree {
         return when (lex.curToken()) {
             Token.STAR -> {
                 consume(Token.STAR)
-                nonTerminal("cliniContinue", CLINI)
+                nonTerminal("cliniOrRepeatsContinue", CLINI)
             }
 
-            else -> nonTerminal("cliniContinue", EMPTY)
+            Token.LPARENF -> {
+                consume(Token.LPARENF)
+                if (lex.curToken() != Token.NUMBER) {
+                    throw IllegalArgumentException("Exprected number, got ${lex.curToken()}")
+                }
+                val number = lex.curValue()
+                lex.nextToken()
+                consume(Token.RPARENF)
+                nonTerminal("cliniOrRepeatsContinue", terminal("{$number}"))
+            }
+
+            else -> nonTerminal("cliniOrRepeatsContinue", EMPTY)
         }
     }
 
